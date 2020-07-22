@@ -206,7 +206,7 @@ yarn add react react-dom -S
 
 修改 `src/index.js`使用`react`
 
-```javascript
+```tsx
 import React from 'react';
 import ReactDom from 'react-dom';
 
@@ -218,7 +218,7 @@ ReactDom.render(
 
 接下来我们使用`react`的组件化思想做一下封装，`src`下新建`components`目录，然后新建一个`Hello`目录，里面创建一个`index.js`，写入：
 
-```javascript
+```tsx
 import React, { PureComponent } from 'react';
 
 export default class Hello extends PureComponent  {
@@ -234,7 +234,7 @@ export default class Hello extends PureComponent  {
 
 然后让我们修改`src/index.js`，引用`Hello`组件！
 
-```javascript
+```tsx
 import React from 'react';
 import ReactDom from 'react-dom';
 import Hello from './components/Hello';
@@ -243,7 +243,114 @@ ReactDom.render(
     <Hello/>, document.getElementById('app'));
 ```
 
-注：import 模块化导入会默认选择目录下的index文件，所以直接写成'./components/Hello'
+注：import 模块化导入会默认选择目录下的index文件，所以直接写成`./components/Hello`
 
 在根目录执行打包命令,刷新`index.html`查看运行效果
+
+
+### 使用react-router路由
+
+对接react的路由`react-router`
+
+```cmd
+yarn add react-router-dom -S
+```
+
+接下来为了使用路由，我们建两个页面来做路由切换的内容。首先在`src`下新建一个`pages`目录，然后`pages`目录下分别创建`home`和`page`目录，里面分别创建一个`index.js`。
+
+`src/pages/home/index.js`
+
+```tsx
+import React, {PureComponent} from 'react';
+
+export default class Home extends PureComponent {
+    render() {
+        return (
+            <div>
+                this is home~
+            </div>
+        )
+    }
+}
+```
+
+`src/pages/page/index.js`
+
+```tsx
+import React, {PureComponent} from 'react';
+
+export default class Page extends PureComponent {
+    render() {
+        return (
+            <div>
+                this is Page~
+            </div>
+        )
+    }
+}
+```
+
+两个页面就写好了，然后创建我们的菜单导航组件
+
+`components/Nav/index.js`
+
+```tsx
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+export default () => {
+    return (
+        <div>
+            <ul>
+                <li><Link to="/">首页</Link></li>
+                <li><Link to="/page">Page</Link></li>
+            </ul>
+        </div>
+    )
+}
+```
+
+注：使用`Link`组件改变当前路由
+
+然后我们在`src`下面新建`router.js`，写入我们的路由，并把它们跟页面关联起来
+
+```tsx
+import React from 'react';
+import { Route, Switch } from 'react-router-dom';
+
+// 引入页面
+import Home from './pages/home';
+import Page from './pages/page';
+
+// 路由
+const getRouter = () => (
+    <Switch>
+        <Route exact path="/" component={Home}/>
+        <Route path="/page" component={Page}/>
+    </Switch>
+);
+
+export default getRouter;
+```
+
+
+页面和菜单和路由都写好了，我们把它们关联起来。在`src/index.js`中
+
+```tsx
+import React from 'react';
+import ReactDom from 'react-dom';
+import {BrowserRouter as Router} from 'react-router-dom';
+import Nav from './components/Nav';
+import getRouter from './router';
+
+ReactDom.render(
+    <Router>
+        <Nav/>
+        {getRouter()}
+    </Router>,
+    document.getElementById('app')
+)
+```
+
+现在执行`yarn build`打包后就可以看到内容了，但是点击菜单并没有反应，这是正常的。因为我们目前使用的依然是本地磁盘路径，并不是ip+端口的形式，接下来我们引入`webpack-dev-server`来启动一个简单的服务器。
 
