@@ -194,5 +194,24 @@ yarn build
 有兴趣的可以打开打包好的bundle.js，最下面会发现ES6箭头函数被转换为普通的function函数
 
 
+### 接入react
+
+安装`react`包
+
+```cmd
+yarn add react react-dom -S
+```
+
+这里使用 `-S` 来保证生产环境的依赖
+
+修改 `src/index.js`使用`react`
+
+```javascript
+import React from 'react';
+import ReactDom from 'react-dom';
+
+ReactDom.render(
+    <div>Hello React!</div>, document.getElementById('app'));
+```
 
 
