@@ -214,4 +214,36 @@ ReactDom.render(
     <div>Hello React!</div>, document.getElementById('app'));
 ```
 
+执行打包命令后，刷新`index.html`查看运行效果
+
+接下来我们使用`react`的组件化思想做一下封装，`src`下新建`components`目录，然后新建一个`Hello`目录，里面创建一个`index.js`，写入：
+
+```javascript
+import React, { PureComponent } from 'react';
+
+export default class Hello extends PureComponent  {
+    render() {
+        return (
+            <div>
+                Hello,组件化-React!
+            </div>
+        )
+    }
+}
+```
+
+然后让我们修改`src/index.js`，引用`Hello`组件！
+
+```javascript
+import React from 'react';
+import ReactDom from 'react-dom';
+import Hello from './components/Hello';
+
+ReactDom.render(
+    <Hello/>, document.getElementById('app'));
+```
+
+注：import 模块化导入会默认选择目录下的index文件，所以直接写成'./components/Hello'
+
+在根目录执行打包命令,刷新`index.html`查看运行效果
 
