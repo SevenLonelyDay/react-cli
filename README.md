@@ -353,4 +353,101 @@ ReactDom.render(
 ```
 
 现在执行`yarn build`打包后就可以看到内容了，但是点击菜单并没有反应，这是正常的。因为我们目前使用的依然是本地磁盘路径，并不是ip+端口的形式，接下来我们引入`webpack-dev-server`来启动一个简单的服务器。
+安装
+
+```cmd
+yarn global add webpack-dev-server -D
+```
+
+修改`webpack.dev.config.js`,增加`webpack-dev-server`的配置。
+
+```javascript
+// webpack-dev-server
+devServer: {
+    contentBase: path.join(__dirname, '../dist'), 
+    compress: true,  // gzip压缩
+    host: '0.0.0.0', // 允许ip访问
+    hot:true, // 热更新
+    historyApiFallback:true, // 解决启动后刷新404
+    port: 8000 // 端口
+},
+```
+
+注：contentBase一般不配，主要是允许访问指定目录下面的文件，这里使用到了dist下面的index.html
+
+然后在`package.json`里新建启动命令
+
+```cmd
+"start": "webpack-dev-server --config ./build/webpack.dev.config.js",
+```
+
+执行`yarn start`命令后打开 `http://localhost:8000` 即可看到内容，并可以切换路由了！
+
+### 配置代理
+
+devServer下有个proxy属性可以帮助我们设置代理，代理后台接口和前端在一个域名下
+
+修改`webpack.dev.config.js`
+```javascript
+     devServer: {
+       ...
+        proxy: { // 配置服务代理
+            '/api': {
+                 target: 'http://localhost:8000',
+                 pathRewrite: {'^/api' : ''},  //可转换
+                 changeOrigin:true
+            }
+        },
+        port: 8000 // 端口
+     },
+```
+
+在 `localhost:8000` 上有后端服务的话，你可以这样启用代理。请求到 `/api/users` 现在会被代理到请求`http://localhost:8000`。（注意这里的第二个属性，它将`'/api'`替换成了`''`空字符串）。`changeOrigin:true`可以帮我们解决跨域的问题。
+
+
+### devtool优化
+
+当启动报错或者像打断点的时候，会发现打包后的代码无从下手。所以我们使用`devtool`方便调试。在`webpack.dev.config.js`里面添加
+```javascript
+devtool: 'inline-source-map'
+```
+
+然后就可以在srouce里面能看到我们写的代码，也能打断点调试哦~
+
+### 文件路由优化
+
+正常我们引用组件或者页面的时候，一般都是已`../`的形式去使用。若是文件层级过深，会导致`../../../`的情况，不好维护和读懂，为此`webpack`提供了`alias` 别名配置。
+
+看这里：切记名称不可声明成你引入的其他包名。别名的会覆盖你的包名，导致你无法引用其他包。栗子：`redux`、`react`等
+首先在`webpack.dev.config.js`里面加入
+
+```javascript
+resolve: {
+    alias: {
+        '@pages': path.join(__dirname, '../src/pages'),
+        '@components': path.join(__dirname, '../src/components'),
+        '@router': path.join(__dirname, '../src/router')
+    }
+}
+```
+
+然后我们的router.js里面引入组件就可以改为
+
+```tsx
+// 之前引入页面
+import Home from './pages/home';
+import Page from './pages/page';
+
+// 现在引入页面
+import Home from 'pages/home';
+import Page from 'pages/page';
+```
+
+此功能层级越复杂越好用。
+
+
+
+
+
+
 
