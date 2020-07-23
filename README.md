@@ -616,6 +616,37 @@ ReactDom.render(
 ```
 Provider组件是让所有的组件可以访问到store。不用手动去传。也不用手动去监听。 接着我们启动一下，`yarn start`,然后就可以再浏览器中看到我们的计数器功能了。
 
+我们开发中会有很多的`reducer`，`redux`提供了一个`combineReducers`函数来合并`reducer`，使用起来非常简单。在`store.js`中引入`combineReducers`并使用它。
 
+
+```tsx
+import {combineReducers} from 'redux';
+
+let store = createStore(combineReducers({counter}));
+```
+
+然后我们在`counter`页面组件中，使用`connect`注入的`state`改为`counter`即可(`state`完整树中选择你需要的数据集合)。
+
+```tsx
+export default connect(({counter}) => counter, dispatch => ({
+    increment: () => {
+        dispatch(increment())
+    },
+    decrement: () => {
+        dispatch(decrement())
+    },
+    reset: () => {
+        dispatch(reset())
+    }
+}))(Counter);
+```
+
+
+梳理一下redux的工作流：
+
+- 调用`store.dispatch(action)`提交action。
+- `redux store`调用传入的`reducer`函数。把当前的`state`和`action`传进去。
+- 根 `reducer` 应该把多个子 `reducer` 输出合并成一个单一的 `state` 树。
+- `Redux store` 保存了根 `reducer` 返回的完整 `state` 树。
 
 
