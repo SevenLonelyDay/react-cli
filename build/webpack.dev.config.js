@@ -36,7 +36,9 @@ module.exports = {
         alias: {
             '@pages': path.join(__dirname, '../src/pages'),
             '@components': path.join(__dirname, '../src/components'),
-            '@router': path.join(__dirname, '../src/router')
+            '@router': path.join(__dirname, '../src/router'),
+            '@actions': path.join(__dirname, '../src/redux/actions'),
+            '@reducers': path.join(__dirname, '../src/redux/reducers')
         }
     },
     /*输出到dist目录，输出文件名字为bundle.js*/

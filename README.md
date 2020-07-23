@@ -445,8 +445,176 @@ import Page from 'pages/page';
 
 此功能层级越复杂越好用。
 
+### 使用redux
+
+接下来我们要集成`redux`，我们先不讲理论，直接用`redux`做一个最常见的例子，计数器。首先我们在`src`下创建一个`redux`目录，里面分别创建两个目录，`actions`和`reducers`，分别存放我们的`action`和`reducer`。
+
+安装`redux`和`react-redux`
+```cmd
+yarn add redux -S
+yarn add react-redux  -S
+```
+
+在目录下`redux/actions`下创建`counter.js`
+
+```tsx
+/*action*/
+
+export const INCREMENT = "counter/INCREMENT";
+export const DECREMENT = "counter/DECREMENT";
+export const RESET = "counter/RESET";
+
+export function increment() {
+    return {type: INCREMENT}
+}
+
+export function decrement() {
+    return {type: DECREMENT}
+}
+
+export function reset() {
+    return {type: RESET}
+}
+```
+
+在目录下`redux/reducers`下创建`counter.js`
+
+```tsx
+import {INCREMENT, DECREMENT, RESET} from '@actions/counter';
+
+/*
+* 初始化state
+ */
+
+const initState = {
+    count: 0
+};
+/*
+* reducer
+ */
+export default function reducer(state = initState, action) {
+    switch (action.type) {
+        case INCREMENT:
+            return {
+                count: state.count + 1
+            };
+        case DECREMENT:
+            return {
+                count: state.count - 1
+            };
+        case RESET:
+            return {count: 0};
+        default:
+            return state
+    }
+}
+```
+
+在`webpack.dev.config.js`配置里添加`actions`和`reducers`的别名。
+
+```tsx
+'@actions': path.join(__dirname, '../src/redux/actions'),
+'@reducers': path.join(__dirname, '../src/redux/reducers')
+```
+
+到这里要说一下，`action`创建函数，主要是返回一个`action`类，`action`类有个`type`属性，来决定执行哪一个`reducer`。`reducer`是一个纯函数（只接受和返回参数，不引入其他变量或做其他功能），主要接受旧的`state`和`action`，根据`action`的`type`来判断执行，然后返回一个新的`state`。
+
+>特殊说明：你可能有很多`reducer`，`type`一定要是全局唯一的，一般通过`prefix`来修饰实现。例子：`counter/INCREMENT`里的`counter`就是他所有type的前缀。
 
 
+接下来我么要在redux目录下创建一个store.js。
+
+```tsx
+import {createStore} from 'redux';
+import counter  from '@reducers/counter';
+
+let store = createStore(counter);
+
+export default store;
+```
+
+
+store的具体功能介绍：
+
+- 维持应用的 state；
+- 提供 getState() 方法获取 state；
+- 提供 dispatch(action) 触发reducers方法更新 state；
+- 通过 subscribe(listener) 注册监听器;
+- 通过 subscribe(listener) 返回的函数注销监听器。
+
+接着我们创建一个`counter`页面来使用`redux`数据。在`pages`目录下创建一个`counter`目录和`index.js`。
+页面中引用我们的`actions`来执行`reducer`改变数据。
+
+```tsx
+
+import React, {PureComponent} from 'react';
+import { connect } from 'react-redux';
+import { increment, decrement, reset } from '@actions/counter';
+
+class Counter extends PureComponent {
+    render() {
+        return (
+            <div>
+                <div>当前计数为{this.props.count}</div>
+                <button onClick={() => this.props.increment()}>自增
+                </button>
+                <button onClick={() => this.props.decrement()}>自减
+                </button>
+                <button onClick={() => this.props.reset()}>重置
+                </button>
+            </div>
+        )
+    }
+}
+export default connect((state) => state, dispatch => ({
+    increment: () => {
+        dispatch(increment())
+    },
+    decrement: () => {
+        dispatch(decrement())
+    },
+    reset: () => {
+        dispatch(reset())
+    }
+}))(Counter);
+```
+
+
+`connect`是什么呢？`react-redux`提供了一个方法`connect`。`connect`主要有两个参数，一个`mapStateToProps`,就是把`redux`的`state`，转为组件的`Props`，还有一个参数是`mapDispatchToprops`,把发射`actions`的方法，转为`Props`属性函数。
+
+
+接着我们添加计数器的菜单和路由来展示我们的计数器功能。
+
+```tsx
+Nav组件
+
+<li><Link to="/counter">Counter</Link></li>
+```
+
+```tsx
+router.js
+import Counter from '@pages/counter';
+---
+<Route path="/counter" component={Counter}/>
+```
+
+最后在`src/index.js`中使用`store`功能
+
+```tsx
+import {Provider} from 'react-redux';
+import store from './redux/store';
+
+ReactDom.render(
+    <Provider store={store}>
+        <Router>
+            <Nav/>
+            {getRouter()}
+        </Router>
+    </Provider>,
+    document.getElementById('app')
+)
+```
+Provider组件是让所有的组件可以访问到store。不用手动去传。也不用手动去监听。 接着我们启动一下，`yarn start`,然后就可以再浏览器中看到我们的计数器功能了。
 
 
 
