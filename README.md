@@ -678,3 +678,113 @@ plugins: [
 ```
 
 接下来，我们每次启动都会使用这个`html-webpack-plugin`，`webpack`会自动将打包好的JS注入到这个`index.html`模板里面。
+
+
+### 编译css优化
+
+首先安装css的`loader`
+```shell script
+yarn add css-loader style-loader -D
+```
+
+然后在我们之前的`pages/page`目录下添加`index.css`文件，写入一行css
+
+```css
+.page-box {
+    border: 1px solid red;
+    display: flex;
+}
+```
+
+然后我们在`page/index.js`中引入并使用
+
+```tsx
+import './index.css';
+
+<div class="page-box">
+    this is Page~
+</div>
+```
+
+最后我们让webpack支持加载css，在`webpack.dev.config.js` `rules`增加
+
+```javascript
+rules: [{
+    test: /\.js$/,
+    use: ['babel-loader?cacheDirectory=true'],
+    include: path.join(__dirname, '../src')
+},{
+    test: /\.css$/,
+    use: ['style-loader', 'css-loader']
+}]
+```
+
+`yarn start` 启动后查看page路由就可以看到样式生效了。
+
+
+- `css-loader`使你能够使用类似@import 和 url(...)的方法实现 require()的功能；
+
+
+- `style-loader`将所有的计算后的样式加入页面中； 二者组合在一起使你能够把样式表嵌入webpack打包后的JS文件中。
+
+
+### 集成PostCSS优化
+
+刚才的样式我们加了个`display:flex;`样式,往往我们在写CSS的时候需要加浏览器前缀。可是手动添加太过于麻烦，`PostCSS`提供了`Autoprefixer`这个插件来帮我们完成这个工作。
+
+安装`postcss-loader` `postcss-cssnext`
+
+
+```shell script
+yarn add postcss-loader postcss-cssnext -D
+```
+
+`postcss-cssnext` 允许你使用未来的 CSS 特性（包括 `autoprefixer`）。
+
+然后配置`webpack.dev.config.js`
+
+```shell script
+rules: [{
+    test: /\.(css)$/,
+    use: ['style-loader', 'css-loader', 'postcss-loader']
+}]
+```
+
+然后在根目录下新建`postcss.config.js`
+
+```js
+module.exports = {
+    plugins: {
+        'postcss-cssnext': {}
+    }
+};
+```
+
+现在你运行代码，然后写个css，去浏览器审查元素，看看，属性是不是生成了浏览器前缀!。如下：
+
+```css
+/** 编译前 */
+.page-box {
+    border: 1px solid red;
+    display: flex;
+}
+
+/** 编译后 */
+.page-box {
+    border: 1px solid red;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+```
+
+
+
+
+
+
+
+
+
+

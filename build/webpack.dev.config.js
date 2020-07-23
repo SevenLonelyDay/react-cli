@@ -14,6 +14,9 @@ module.exports = {
             test: /\.js$/,
             use: ['babel-loader?cacheDirectory=true'],
             include: path.join(__dirname, '../src')
+        },{
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader', 'postcss-loader']
         }]
     },
     // webpack启动服务配置
