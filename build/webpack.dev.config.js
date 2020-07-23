@@ -1,4 +1,5 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
 
@@ -17,7 +18,7 @@ module.exports = {
     },
     // webpack启动服务配置
     devServer: {
-        contentBase: path.join(__dirname, '../dist'),
+        // contentBase: path.join(__dirname, '../dist'),
         compress: true,  // gzip压缩
         host: '0.0.0.0', // 允许ip访问
         hot:true, // 热更新
@@ -32,6 +33,14 @@ module.exports = {
         port: 8000 // 端口
     },
     devtool: 'inline-source-map',
+    // webpack插件
+    plugins: [
+        // html入口文件
+        new HtmlWebpackPlugin({
+            filename: 'index.html',
+            template: path.join(__dirname, '../public/index.html')
+        })
+    ],
     resolve: {
         alias: {
             '@pages': path.join(__dirname, '../src/pages'),

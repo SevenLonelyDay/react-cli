@@ -24,18 +24,18 @@ babel-loader            8.1.0
 ### 初始化项目
 
 1. 先创建一个目录并进入
-```cmd
+```shell script
 mkdir react-cli && cd react-cli
 ```
 
 2. 初始化项目,填写项目信息（可一路回车）
-```cmd
+```shell script
 npm init
 ```
 
 ### 创建webpack打包环境
 
-```cmd
+```shell script
 yarn add webpack -D 
 yarn add webpack-cli -D 
 ```
@@ -44,7 +44,7 @@ yarn add webpack-cli -D
 
 安装好后新建`build`目录放一个webpack基础的开发配置`webpack.dev.config.js`
 
-```cmd
+```shell script
 mkdir build && cd build && echo. > webpack.dev.config.js
 ```
 
@@ -68,7 +68,7 @@ module.exports = {
 
 然后根据我们配置的入口文件的地址，创建`../src/index.js`文件(请注意src目录和build目录同级)
 
-```cmd
+```shell script
 mkdir src && cd src && echo. > index.js
 ```
 
@@ -90,7 +90,7 @@ document.getElementById('app').innerHTML = 'Hello React';
 
 现在在根目录下执行配置的打包命令
 
-```cmd
+```shell script
 yarn build
 ```
 
@@ -138,7 +138,7 @@ Hello React
 
 安装babel
 
-```cmd
+```shell script
 yarn add @babel/core @babel/preset-env @babel/preset-react babel-loader -D
 ```
 
@@ -181,7 +181,7 @@ module: {
 
 执行打包命令
 
-```cmd
+```shell script
 yarn build
 ```
 
@@ -198,7 +198,7 @@ yarn build
 
 安装`react`包
 
-```cmd
+```shell script
 yarn add react react-dom -S
 ```
 
@@ -252,7 +252,7 @@ ReactDom.render(
 
 对接react的路由`react-router`
 
-```cmd
+```shell script
 yarn add react-router-dom -S
 ```
 
@@ -355,7 +355,7 @@ ReactDom.render(
 现在执行`yarn build`打包后就可以看到内容了，但是点击菜单并没有反应，这是正常的。因为我们目前使用的依然是本地磁盘路径，并不是ip+端口的形式，接下来我们引入`webpack-dev-server`来启动一个简单的服务器。
 安装
 
-```cmd
+```shell script
 yarn global add webpack-dev-server -D
 ```
 
@@ -377,7 +377,7 @@ devServer: {
 
 然后在`package.json`里新建启动命令
 
-```cmd
+```shell script
 "start": "webpack-dev-server --config ./build/webpack.dev.config.js",
 ```
 
@@ -450,7 +450,7 @@ import Page from 'pages/page';
 接下来我们要集成`redux`，我们先不讲理论，直接用`redux`做一个最常见的例子，计数器。首先我们在`src`下创建一个`redux`目录，里面分别创建两个目录，`actions`和`reducers`，分别存放我们的`action`和`reducer`。
 
 安装`redux`和`react-redux`
-```cmd
+```shell script
 yarn add redux -S
 yarn add react-redux  -S
 ```
@@ -650,3 +650,31 @@ export default connect(({counter}) => counter, dispatch => ({
 - `Redux store` 保存了根 `reducer` 返回的完整 `state` 树。
 
 
+### HtmlWebpackPlugin优化
+
+之前我们一直通过webpack里面`contentBase: path.join(__dirname, '../dist'),`的配置获取`dist/index.html`来访问。需要写死引入的JS，比较麻烦。这个插件，每次会自动把js插入到你的模板index.html里面去。
+
+我们使用
+```shell script
+yarn add html-webpack-plugin -D
+```
+
+
+然后注释`webpack.dev.config.js`的`contentBase`配置，并在根目录下新建`public`目录，将`dist`下的`index.html`移动到`public`下，然后删除`bundle.js`的引用
+
+接着在`webpack.dev.config.js`里面加入`html-webpack-plugin`的配置。
+
+
+```javascript
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+plugins: [
+    new HtmlWebpackPlugin({
+        filename: 'index.html',
+        template: path.join(__dirname, '../public/index.html')
+    })
+]
+
+```
+
+接下来，我们每次启动都会使用这个`html-webpack-plugin`，`webpack`会自动将打包好的JS注入到这个`index.html`模板里面。
