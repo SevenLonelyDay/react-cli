@@ -868,6 +868,71 @@ import pic from '@images/a.png'
 重启webpack后查看到图片
 
 
+### 按需加载
+
+我们现在启动后看到他每次都加载一个bundle.js文件。当我们首屏加载的时候，就会很慢。因为他也下载其他的东西，所以我们需要一个东西区分我们需要加载什么。目前大致分为按路由和按组件。我们这里使用常用的按路由加载。react-router4.0以上提供了`react-loadable`。
+
+
+首先引入`react-loadable`
+
+
+```shell script
+yarn add react-loadable -D
+```
+
+然后改写我们的`router.js`
+
+```tsx
+// 之前
+import Home from 'pages/home';
+import Page from 'pages/page';
+import Counter from 'pages/counter';
+
+// 之后
+import loadable from 'react-loadable';
+import Loading from '@components/Loading';
+
+const Home = loadable({
+    loader: () => import('@pages/Home'),
+    loading: Loading,
+    timeout: 10000, // 10 seconds
+})
+const Page = loadable({
+    loader: () => import('@pages/page'),
+    loading: Loading,
+    timeout: 10000, // 10 seconds
+})
+const Counter = loadable({
+    loader: () => import('@pages/Counter'),
+    loading: Loading,
+    timeout: 10000, // 10 seconds
+})
+
+```
+
+`loadable`需要一个`loading`组件，我们在`components`下新增一个`Loading`组件
+
+```tsx
+import React from 'react';
+
+export default () => {
+    return <div>Loading...</div>
+};
+```
+
+这个时候启动会发现报错不支持动态导入，那么我们需要babel支持动态导入。 首先引入
+
+```shell script
+yarn add @babel/plugin-syntax-dynamic-import -D
+```
+
+然后配置`babel.config.js`文件
+
+```javascript
+plugins: ["@babel/plugin-syntax-dynamic-import"]
+```
+再启动就会发现source下不只有`bundle.js`一个文件了。而且每次点击路由菜单，都会新加载该菜单的文件，真正的做到了按需加载。
+
 
 
 
