@@ -1040,5 +1040,24 @@ plugins: [
 - `contenthash`是针对文件内容级别的，只有你自己模块的内容变了，那么`hash`值才改变，所以我们可以通过`contenthash`解决上诉问题
 
 
+### 生产坏境构建
 
+
+开发环境(`development`)和生产环境(`production`)的构建目标差异很大。
+
+在开发环境中，我们需要具有实时重新加载 或 热模块替换能力的 `source map` 和 `localhost server`。
+
+在生产环境中，我们的目标则转向于关注更小的 `bundle`，更轻量的 `source map`，以及更优化的资源，以改善加载时间。
+
+`build`目录下新建`webpack.prod.config.js`,复制原有配置做修改。首先删除`webpack.dev.config.js`中的`MiniCssExtractPlugin`，然后删除`webpack.prod.config.js`中的`devServer`，然后修改打包命令。
+
+
+```shell script
+"build": "webpack --config ./build/webpack.prod.config.js"
+```
+
+
+再把`webpack.prod.config.js`文件中的`devtool`的值改成`none`。
+
+接下来我们为打包多做一些优化。
 
