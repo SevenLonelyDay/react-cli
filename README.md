@@ -823,9 +823,49 @@ css-loader?modules
 重启webpack后打开控制台，发现class样式变成了`class="page-box--1wbxe"`
 
 
+### 编译图片优化
+
+安装图片的加载器
 
 
+```shell script
+yarn add url-loader file-loader -D
+```
 
+
+然后在src下新建images目录，并放一个图片`a.png`。
+
+
+接着在`webpack.dev.config.js`的`rules`中配置，同时添加`images`别名。
+
+```javascript
+{
+    test: /\.(png|jpg|gif)$/,
+    use: [{
+        loader: 'url-loader',
+        options: {
+            limit: 8192
+        }
+    }]
+}
+
+'@images': path.join(__dirname, '../src/images'),
+```
+
+options `limit 8192`意思是，小于等于8K的图片会被转成base64编码，直接插入HTML中，减少HTTP请求。
+
+然后我们继续在刚才的page页面，引入图片并使用它。
+
+```tsx
+import pic from '@images/a.png'
+
+<div className={style["page-box"]}>
+    this is Page~
+    <img src={pic}/>
+</div>
+```
+
+重启webpack后查看到图片
 
 
 
