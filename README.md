@@ -1075,4 +1075,18 @@ mode:'production',
 
 打包后体积大幅度变小
 
+### 公共块提取
 
+
+这表示将选择哪些块进行优化。当提供一个字符串，有效值为`all`，`async`和`initial`。提供`all`可以特别强大，因为这意味着即使在异步和非异步块之间也可以共享块。
+
+
+```javascript
+optimization: {
+    splitChunks: {
+      chunks: 'all'
+    }
+}
+```
+
+重新打包，你会发现打包体积变小。

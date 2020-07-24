@@ -70,5 +70,10 @@ module.exports = {
             '@reducers': path.join(__dirname, '../src/redux/reducers'),
             '@images': path.join(__dirname, '../src/images')
         }
+    },
+    optimization: {
+        splitChunks: {
+          chunks: 'all'
+        }
     }
 };
