@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = {
 
@@ -59,7 +60,8 @@ module.exports = {
         new MiniCssExtractPlugin({ // 压缩css
             filename: '[name].[contenthash].css',
             chunkFilename: '[id].[contenthash].css'
-        })
+        }),
+        new OptimizeCssAssetsPlugin()
     ],
     resolve: {
         alias: {

@@ -1090,3 +1090,37 @@ optimization: {
 ```
 
 重新打包，你会发现打包体积变小。
+
+### css压缩
+
+我们发现使用了生产环境的`mode`配置以后，JS是压缩了，但是css并没有压缩。这里我们使用`optimize-css-assets-webpack-plugin`插件来压缩css。以下是官网建议
+
+> 虽然webpack 5可能内置了`CSS minimizer`，但是你需要携带自己的`webpack 4`。要缩小输出，请使用像`optimize-css-assets-webpack-plugin`这样的插件。设置`optimization.minimizer`会覆盖webpack提供的默认值，因此请务必同时指定`JS minimalizer`
+
+
+安装`optimize-css-assets-webpack-plugin`插件
+
+```shell script
+yarn add optimize-css-assets-webpack-plugin -D
+```
+
+
+添加打包配置`webpack.prod.config.js`
+
+
+```javascript
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
+plugins: [
+    ...
+    new OptimizeCssAssetsPlugin()
+],
+
+```
+
+重新打包，你会发现单独提取出来的CSS也压缩了。
+
+
+
+
+
