@@ -1122,5 +1122,26 @@ plugins: [
 
 
 
+### 打包清空
+
+我们发现每次打包，只要改动后都会增加文件，怎么自动清空之前的打包内容呢？`webpack`提供了`clean-webpack-plugin`插件。 
+
+安装`clean-webpack-plugin`
+
+
+```shell script
+yarn add clean-webpack-plugin -D
+```
+
+然后配置打包文件
+
+```javascript
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+plugins: [
+    ...
+    new CleanWebpackPlugin(), // 每次打包前清空
+],
+```
+
 
 
