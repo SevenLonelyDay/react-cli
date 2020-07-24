@@ -18,7 +18,8 @@ module.exports = {
     output: {
         path: path.join(__dirname, '../dist'),
         filename: '[name].[hash].js',
-        chunkFilename: '[name].[chunkhash].js'
+        chunkFilename: '[name].[chunkhash].js',
+        publicPath : '/'
     },
     // 配置环境变量
     mode:'production',

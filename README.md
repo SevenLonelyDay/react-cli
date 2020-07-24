@@ -1143,5 +1143,14 @@ plugins: [
 ],
 ```
 
+### public path
 
+`publicPath` 配置选项在各种场景中都非常有用。你可以通过它来指定应用程序中所有资源的基础路径。在打包配置中添加
+
+
+```javascript
+output: {
+    publicPath : '/'
+}
+```
 
