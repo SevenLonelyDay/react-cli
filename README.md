@@ -1061,3 +1061,18 @@ plugins: [
 
 接下来我们为打包多做一些优化。
 
+
+
+### 文件压缩
+
+以前`webpack`使用`uglifyjs-webpack-plugin`来压缩文件，使我们打包出来的文件体积更小。
+
+现在只需要配置`mode`即可自动使用开发环境的一些配置，包括JS压缩等等
+
+```javascript
+mode:'production',
+```
+
+打包后体积大幅度变小
+
+
