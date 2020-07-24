@@ -974,4 +974,22 @@ const NotFound = loadable({
 这个时候输入一个不存在的路由，就会发现页面组件展现为404。
 
 
+### 提取公共代码
 
+
+我们打包的文件里面包含了`react`,`redux`,`react-router`等等这些代码，每次发布都要重新加载，其实没必要，我们可以将他们单独提取出来。在`webpack.dev.config.js`中配置入口：
+
+```javascript
+entry: {
+    app:[
+        path.join(__dirname, '../src/index.js')
+    ],
+    vendor: ['react', 'react-router-dom', 'redux', 'react-dom', 'react-redux']
+},
+output: {
+    path: path.join(__dirname, '../dist'),
+    filename: '[name].[hash].js',
+    chunkFilename: '[name].[chunkhash].js'
+},
+
+```

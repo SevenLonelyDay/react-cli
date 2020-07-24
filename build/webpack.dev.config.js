@@ -4,7 +4,18 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
 
     /*入口*/
-    entry: path.join(__dirname, '../src/index.js'),
+    entry: {
+        app:[
+            path.join(__dirname, '../src/index.js')
+        ],
+        vendor: ['react', 'react-router-dom', 'redux', 'react-dom', 'react-redux']
+    },
+    /*输出到dist目录，输出文件名字为bundle.js*/
+    output: {
+        path: path.join(__dirname, '../dist'),
+        filename: '[name].[hash].js',
+        chunkFilename: '[name].[chunkhash].js'
+    },
     // 配置环境变量
     mode:'development',
     /*src目录下面的以.js结尾的文件，要使用babel解析*/
@@ -68,10 +79,5 @@ module.exports = {
             '@reducers': path.join(__dirname, '../src/redux/reducers'),
             '@images': path.join(__dirname, '../src/images')
         }
-    },
-    /*输出到dist目录，输出文件名字为bundle.js*/
-    output: {
-        path: path.join(__dirname, '../dist'),
-        filename: 'bundle.js'
     }
 };
