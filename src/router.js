@@ -7,7 +7,7 @@ import loadable from 'react-loadable';
 import Loading from '@components/Loading';
 
 const Home = loadable({
-    loader: () => import('@pages/Home'),
+    loader: () => import('@pages/home'),
     loading: Loading,
     timeout: 10000, // 10 seconds
 })
@@ -17,10 +17,16 @@ const Page = loadable({
     timeout: 10000, // 10 seconds
 })
 const Counter = loadable({
-    loader: () => import('@pages/Counter'),
+    loader: () => import('@pages/counter'),
     loading: Loading,
     timeout: 10000, // 10 seconds
 })
+const NotFound = loadable({
+    loader: () => import('@pages/notfound'),
+    loading: Loading,
+    timeout: 10000, // 10 seconds
+})
+
 
 
 // 路由
@@ -29,6 +35,7 @@ const getRouter = () => (
         <Route exact path="/" component={Home}/>
         <Route path="/page" component={Page}/>
         <Route path="/counter" component={Counter}/>
+        <Route component={NotFound}/>
     </Switch>
 );
 

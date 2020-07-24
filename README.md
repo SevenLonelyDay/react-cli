@@ -934,6 +934,44 @@ plugins: ["@babel/plugin-syntax-dynamic-import"]
 再启动就会发现source下不只有`bundle.js`一个文件了。而且每次点击路由菜单，都会新加载该菜单的文件，真正的做到了按需加载。
 
 
+### 添加404路由
+
+pages目录下新建一个`notfound`目录和`404`页面组件
+
+```tsx
+import React, {PureComponent} from 'react';
+
+class NotFound extends PureComponent {
+    render() {
+        return (
+            <div>
+                404
+            </div>
+        )
+    }
+}
+export default NotFound;
+```
+
+`router.js`中添加404路由
+
+
+```tsx
+const NotFound = loadable({
+    loader: () => import('@pages/notfound'),
+    loading: Loading,
+    timeout: 10000, // 10 seconds
+})
+
+<Switch>
+    <Route exact path="/" component={Home}/>
+    <Route path="/page" component={Page}/>
+    <Route path="/counter" component={Counter}/>
+    <Route component={NotFound}/>
+</Switch>
+```
+
+这个时候输入一个不存在的路由，就会发现页面组件展现为404。
 
 
 
