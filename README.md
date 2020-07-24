@@ -779,6 +779,50 @@ module.exports = {
 
 ```
 
+### CSS Modules优化
+
+
+CSS的规则都是全局的，任何一个组件的样式规则，都对整个页面有效。产生局部作用域的唯一方法，就是使用一个独一无二的class的名字，不会与其他选择器重名。这就是 `CSS Modules` 的做法。
+
+我们在`webpack.dev.config.js`中启用`modules`
+
+```js
+use: ['style-loader', 'css-loader?modules', 'postcss-loader']
+```
+
+
+接着我们在引入css的时候，可以使用对象`.`属性的形式。（这里有中划线，使用[属性名]的方式）
+
+```tsx
+import style from './index.css';
+
+<div className={style["page-box"]}>
+    this is Page~
+</div>
+```
+
+这个时候打开控制台，你会发现`class`变成了一个哈希字符串。然后我们可以美化一下，使用`cssmodules`的同时，也能看清楚原先是哪个样式。修改`css-loader`
+
+
+```
+/** 修改之前 */
+css-loader?modules
+
+/** 之后 */
+{
+    loader:'css-loader',
+    options: {
+        modules: {
+            localIdentName: '[local]--[hash:base64:5]',
+        }
+    }
+}
+
+```
+
+重启webpack后打开控制台，发现class样式变成了`class="page-box--1wbxe"`
+
+
 
 
 

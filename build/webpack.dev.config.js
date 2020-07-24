@@ -16,7 +16,14 @@ module.exports = {
             include: path.join(__dirname, '../src')
         },{
             test: /\.css$/,
-            use: ['style-loader', 'css-loader', 'postcss-loader']
+            use: ['style-loader', {
+                loader:'css-loader',
+                options: {
+                    modules: {
+                        localIdentName: '[local]--[hash:base64:5]',
+                    },
+                }
+            }, 'postcss-loader']
         }]
     },
     // webpack启动服务配置
