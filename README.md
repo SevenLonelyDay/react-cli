@@ -993,3 +993,40 @@ output: {
 },
 
 ```
+
+
+### 提取css文件
+
+我们看到`source`下只有js文件，但是实际上我们是有一个css文件的，它被打包进入了js文件里面，现在我们将它提取出来。 使用`webpack`的`mini-css-extract-plugin`插件。
+
+
+```shell script
+yarn add mini-css-extract-plugin -D
+```
+
+
+然后在`webpack`中配置
+
+```javascript
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+{
+    test: /\.css$/,
+    use: [{loader: MiniCssExtractPlugin.loader}, {
+        loader:'css-loader',
+        options: {
+            modules: true,
+            localIdentName: '[local]--[hash:base64:5]'
+        }
+    }, 'postcss-loader']
+}
+plugins: [
+    ...,
+    new MiniCssExtractPlugin({ // 压缩css
+        filename: '[name].[contenthash].css',
+        chunkFilename: '[id].[contenthash].css'
+    })
+]
+```
+
+然后在重启，会发现source中多了一个css文件，那么证明我们提取成功了

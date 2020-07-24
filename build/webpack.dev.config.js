@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
 
@@ -27,14 +28,16 @@ module.exports = {
             include: path.join(__dirname, '../src')
         },{
             test: /\.css$/,
-            use: ['style-loader', {
-                loader:'css-loader',
-                options: {
-                    modules: {
-                        localIdentName: '[local]--[hash:base64:5]',
-                    },
-                }
-            }, 'postcss-loader']
+            use: [{
+                    loader: MiniCssExtractPlugin.loader
+                }, {
+                    loader:'css-loader',
+                    options: {
+                        modules: {
+                            localIdentName: '[local]--[hash:base64:5]',
+                        },
+                    }
+                }, 'postcss-loader']
         },{
             test: /\.(png|jpg|gif)$/,
             use: [{
@@ -68,6 +71,10 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: path.join(__dirname, '../public/index.html')
+        }),
+        new MiniCssExtractPlugin({ // 压缩css
+            filename: '[name].[contenthash].css',
+            chunkFilename: '[id].[contenthash].css'
         })
     ],
     resolve: {
