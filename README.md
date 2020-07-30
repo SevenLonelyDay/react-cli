@@ -1360,5 +1360,31 @@ const UserInfo = loadable({
 
 运行，点击请求获取信息按钮，发现报错：`Actions must be plain objects. Use custom middleware for async actions.`这句话标识`actions`必须是个`action`对象，如果想要使用异步必须借助中间件。
 
+### redux-thunk中间件
+
+我们先引入它
+
+```shell script
+yarn add redux-thunk -S
+```
+
+然后我们使用`redux`提供的`applyMiddleware`方法来启动`redux-thunk`中间件，使`actions`支持异步函数。
+
+`store.js` 如下
+
+```javascript
+import {createStore,applyMiddleware} from 'redux';
+import counter  from '@reducers/counter';
+import {combineReducers} from 'redux';
+import userInfo  from '@reducers/userInfo';
+import thunkMiddleware from 'redux-thunk';
+
+let store = createStore(combineReducers({counter, userInfo}), applyMiddleware(thunkMiddleware));
+
+export default store;
+```
+
+然后我们在重新启动一下，会发现获取到了数据。
+
 
 
