@@ -1154,3 +1154,71 @@ output: {
 }
 ```
 
+### 加入 @babel/polyfill、@babel/plugin-transform-runtime、core-js、@babel/runtime-corejs2、@babel/plugin-proposal-class-properties
+
+```shell script
+yarn add @babel/polyfill -S
+```
+
+将以下行添加到您的webpack配置文件的入口中：
+
+```javascript
+ /*入口*/
+entry: {
+    app:[
+        "@babel/polyfill",
+        path.join(__dirname, '../src/index.js')
+    ],
+    vendor: ['react', 'react-router-dom', 'redux', 'react-dom', 'react-redux']
+},
+```
+
+`@babel/polyfill`可以让我们愉快的使用浏览器不兼容的es6、es7的API。但是他有几个缺点：
+
+- 一是我们只是用了几个API，它却整个的引入了
+- 二是会污染全局
+- 接下来我们做一下优化，添加
+
+``shell script
+yarn add @babel/plugin-transform-runtime -D
+yarn add core-js@2.6.5 -D
+yarn add @babel/plugin-proposal-class-properties -D
+
+yarn add @babel/runtime-corejs2 -S
+```
+
+添加完后配置`package.json`,添加`browserslist`，来声明生效浏览器
+```json
+"browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
+```
+
+在修改我们的`babel.config.js`配置文件
+
+```javascript
+const babelConfig = {
+    presets: [['@babel/preset-env',{
+        useBuiltIns: 'entry',
+        corejs: 2
+    }],'@babel/preset-react'],
+    plugins: ['@babel/plugin-syntax-dynamic-import','@babel/plugin-transform-runtime','@babel/plugin-proposal-class-properties']
+}
+
+module.exports = babelConfig;
+```
+
+`useBuiltIns`是关键属性，它会根据 `browserlist` 是否转换新语法与 `polyfill` 新 AP业务代码使用到的新 API 按需进行 `polyfill`
+
+- false : 不启用polyfill, 如果 import '@babel/polyfill', 会无视 browserlist 将所有的 polyfill 加载进来
+- entry : 启用，需要手动 import '@babel/polyfill', 这样会根据 browserlist 过滤出 需要的 polyfill
+- usage : 不需要手动import '@babel/polyfill'(加上也无妨，构造时会去掉), 且会根据 browserlist +
+
+注：经测试usage无法支持IE，推荐使用entry，虽然会大几十K。
+`@babel/plugin-transform-runtime`和`@babel/runtime-corejs2`，前者是开发时候使用，后者是生产环境使用。主要功能：避免多次编译出helper函数：Babel转移后的代码想要实现和原来代码一样的功能需要借助一些帮助函数。还可以解决`@babel/polyfill`提供的类或者实例方法污染全局作用域的情况。
+`@babel/plugin-proposal-class-properties`是我之前漏掉了，如果你要在class里面写箭头函数或者装饰器什么的，需要它的支持。
+
+
+
+
