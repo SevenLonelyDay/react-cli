@@ -1387,4 +1387,57 @@ export default store;
 然后我们在重新启动一下，会发现获取到了数据。
 
 
+### 部署
 
+
+为了测试我们打包出来的文件是否可行，这里简单搭一个小型的`express`服务。首先根目录下新建一个`server`目录，在该目录下执行以下命令。
+
+```shell script
+cd server
+
+npm init 
+
+yarn add nodemon express -D
+```
+
+- `express` 是一个比较容易上手的node框架
+- `nodemon` 是一个`node`开发辅助工具，可以无需重启更新`nodejs`的代码，非常好用。 安装好依赖后，我们添加我们的`express.js`文件来写`node`服务
+
+
+```javascript
+var express = require('express');
+var path = require('path');
+var app = express();
+
+app.get('/dist*', function (req, res) {
+   res.sendFile( path.join(__dirname , "../" + req.url));
+})
+app.use(function (req, res) {
+	res.sendFile(path.join( __dirname , "../dist/" + "index.html" ));
+}) 
+ 
+var server = app.listen(8081, function () {
+  var host = server.address().address
+  var port = server.address().port
+  console.log("应用实例，访问地址为 http://%s:%s", host, port)
+})
+```
+node的代码我就不细说了，大家可以网上找找教程。这里主要是启动了一个端口为8081的服务，然后做了两个拦截，第一个拦截是所有访问dist*这个地址的，将它转到我们的dist下面打包的文件上。第二个拦截是拦截所有错误的地址，将它转发到我们的index.html上，这个可以解决刷新404的问题。
+
+在server目录package.json文件中添加启动命令并执行。
+
+```javascript
+"test": "nodemon ./express.js"
+```
+
+```shell script
+npm run test
+```
+
+启动后访问`http://localhost:8081`会发现很多模块引入`404`，不用慌，这里涉及到之前讲到的一个知识点`--publicPath`。我们将它改为
+修改`webpack.prod.config.js`中的
+```shell script
+publicPath : '/dist/',
+```
+
+在打包一次，就会发现一切正常了，我们node服务好了，打包出来的代码也能正常使用。
