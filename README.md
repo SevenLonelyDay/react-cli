@@ -1219,6 +1219,146 @@ module.exports = babelConfig;
 `@babel/plugin-transform-runtime`和`@babel/runtime-corejs2`，前者是开发时候使用，后者是生产环境使用。主要功能：避免多次编译出helper函数：Babel转移后的代码想要实现和原来代码一样的功能需要借助一些帮助函数。还可以解决`@babel/polyfill`提供的类或者实例方法污染全局作用域的情况。
 `@babel/plugin-proposal-class-properties`是我之前漏掉了，如果你要在class里面写箭头函数或者装饰器什么的，需要它的支持。
 
+### 数据请求axios和Mock
+
+我们现在做前后端完全分离的应用，前端写前端的，服务端写服务端的，他们通过API接口连接。
+然而往往服务端接口写的好慢，前端没法调试，只能等待。这个时候我们就需要我们的`mock.js`来自己提供数据。
+`Mock.js`会自动拦截的我们的`ajax`请求，并且提供各种随机生成数据。（一定要注释开始配置的代理，否则无法请求到我们的mock数据）
+
+首先安装`mockjs`
+
+```shell script
+yarn add mockjs -D
+```
+
+
+然后在根目录下新建`mock`目录，创建`mock.js`
+
+```javascript
+import Mock from 'mockjs';
+ 
+Mock.mock('/api/user', {
+    'name': '@cname',
+    'intro': '@word(20)'
+});
+```
+
+上面代码的意思就是，拦截`/api/user`，返回随机的一个中文名字，一个20个字母的字符串。 然后在我们的`src/index.js`中引入它。
+```javascript
+import '../mock/mock.js';
+```
+
+接口和数据都准备好了，接下来我们写一个请求获取数据并展示。
+
+首先引入axios
+
+```shell script
+yarn add axios -S
+```
+
+然后分别创建`userInfo`的`reducer`、`action`和`page`
+
+`redux/actions/userInfo.js`如下
+
+```javascript
+import axios from 'axios';
+
+export const GET_USER_INFO = "userInfo/GET_USER_INFO";
+
+export function getUserInfo() {
+    return dispatch=>{
+        axios.post('/api/user').then((res)=>{
+            let data = JSON.parse(res.request.responseText);
+            dispatch({
+                type: GET_USER_INFO,
+                payload:data
+            });
+        })
+    }
+}
+```
+
+`redux/reducers/userInfo.js`如下
+
+```javascript
+import { GET_USER_INFO } from '@actions/userInfo';
+
+
+const initState = {
+    userInfo: {}
+};
+
+export default function reducer(state = initState, action) {
+    switch (action.type) {
+        case GET_USER_INFO:
+            return {
+                ...state,
+                userInfo: action.payload,
+            };
+        default:
+            return state;
+    }
+}
+```
+
+`pages/userInfo/index.js`如下
+
+```javascript
+import React, {PureComponent} from 'react';
+import {connect} from 'react-redux';
+import {getUserInfo} from "@actions/userInfo";
+
+class UserInfo extends PureComponent {
+
+    render() {
+        const { userInfo={} } = this.props.userInfo;
+        return (
+            <div>
+            {
+            <div>
+            <p>用户信息：</p>
+        <p>用户名：{userInfo.name}</p>
+        <p>介绍：{userInfo.intro}</p>
+        </div>
+    }
+    <button onClick={() => this.props.getUserInfo()}>请求用户信息</button>
+        </div>
+    )
+    }
+}
+
+export default connect((userInfo) => userInfo, {getUserInfo})(UserInfo);
+```
+然后将我们的`userInfo`添加到全局唯一的`state`，`store`里面去，
+
+`store.js`文件中
+```javascript
+import userInfo  from '@reducers/userInfo';
+
+let store = createStore(combineReducers({counter, userInfo}));
+```
+
+最后在添加新的路由和菜单即可
+
+`router.js`如下
+
+```javascript
+const UserInfo = loadable({
+    loader: () => import('@pages/UserInfo'),
+    loading: Loading,
+    timeout: 10000, // 10 seconds
+})
+
+<Route path="/userinfo" component={UserInfo}/>
+```
+
+`components/Nav/index.js`如下
+
+```javascript
+<li><Link to="/userinfo">UserInfo</Link></li>
+```
+
+运行，点击请求获取信息按钮，发现报错：`Actions must be plain objects. Use custom middleware for async actions.`这句话标识`actions`必须是个`action`对象，如果想要使用异步必须借助中间件。
 
 
 
